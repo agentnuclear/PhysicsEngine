@@ -30,7 +30,31 @@ int main()
         particles.emplace_back(p, RADIUS);
     }
 
-   
+    //Lambda for collision resolution
+    auto resolveCollision = [&](std::vector<Particle>& particles) {
+        for (size_t i = 0; i < particles.size(); ++i) {
+            for (size_t j = i + 1; j < particles.size(); ++j) {
+                sf::Vector2f delta = particles[j].pos - particles[i].pos;
+                float dist2 = delta.x * delta.x + delta.y * delta.y;
+                float minDist = particles[i].radius + particles[j].radius;
+
+                if (dist2 < minDist * minDist) {
+                    float dist = std::sqrt(dist2);
+                    if (dist == 0.0f) {
+                        delta = { 0.01f, 0.01f };
+                        dist = std::sqrt(delta.x * delta.x + delta.y * delta.y);
+                    }
+
+                    sf::Vector2f norm = delta / dist;
+                    float overlap = (minDist - dist) * 0.5f;
+
+                    particles[i].pos -= norm * overlap;
+                    particles[j].pos += norm * overlap;
+                }
+            }
+        }
+    };
+
     //Particle p1(sf::Vector2f(400.f, 100.f), 10.f);
     sf::Clock clock;
     std::size_t frameCounter = 0; //frames
@@ -47,6 +71,8 @@ int main()
         float dt = clock.restart().asSeconds();
         for (auto& pt : particles)
             pt.update(dt);
+
+        resolveCollision(particles);
 
         //render
         window.clear(sf::Color::Black);
