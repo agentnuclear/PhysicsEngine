@@ -18,16 +18,27 @@ int main()
     std::mt19937 rng{ std::random_device{}() };
     std::uniform_real_distribution<float> ux(50.f, static_cast<float>(WIN_W) - 50.f);
     std::uniform_real_distribution<float> uy(50.f, static_cast<float>(WIN_H) - 50.f);
+    std::uniform_real_distribution<float> velDir(-1.f, 1.f); // random direction
 
 
-    const int NUM = 50;
+    const int NUM = 100;
     const float RADIUS = 6.f;
     std::vector<Particle> particles;
     particles.reserve(NUM);
 
+    sf::Vector2f spawnPoint(WIN_W / 2.f, WIN_H / 2.f);
+
     for (int i = 0; i < NUM; ++i) {
-        sf::Vector2f p{ ux(rng), uy(rng) };
-        particles.emplace_back(p, RADIUS);
+        /*sf::Vector2f p{ ux(rng), uy(rng) };
+        particles.emplace_back(p, RADIUS);*/
+        Particle p(spawnPoint, RADIUS);
+        // Give random initial velocity (by modifying oldPosition)
+
+        float vx = velDir(rng) * 100.f; // speed variation
+        float vy = velDir(rng) * 100.f;
+        p.prevPos = spawnPoint - sf::Vector2f(vx * 0.016f, vy * 0.016f); // back in time
+
+        particles.push_back(p);
     }
 
     //Lambda for collision resolution

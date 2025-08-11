@@ -7,6 +7,9 @@ Particle::Particle(const sf::Vector2f& startpos, float r)
 	//adding random initial velocity
 	static std::mt19937 rng{ std::random_device{}() };
 	std::uniform_real_distribution<float> velDist(-50.f, 50.f);
+	//random color
+	std::mt19937 colorrng{ std::random_device{}() };
+	std::uniform_int_distribution<int> colorDist(0, 255);
 
 	sf::Vector2f initialVelocity{ velDist(rng),velDist(rng) };
 	prevPos = pos - initialVelocity; //sets starting speed
@@ -14,7 +17,13 @@ Particle::Particle(const sf::Vector2f& startpos, float r)
 	shape.setRadius(radius);
 	shape.setOrigin(sf::Vector2f(radius,radius));
 	shape.setPosition(pos);
-	shape.setFillColor(sf::Color::White);
+	//shape.setFillColor(sf::Color::White);
+	//random colors
+	shape.setFillColor(sf::Color(
+		colorDist(colorrng),
+		colorDist(colorrng),
+		colorDist(colorrng)
+	));
 }
 
 void Particle::update(float dt)
